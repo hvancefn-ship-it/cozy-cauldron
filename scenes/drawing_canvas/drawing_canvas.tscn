@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/drawing_canvas/drawing_canvas.gd" id="1_canvas"]
+
+[node name="DrawingCanvas" type="Node2D"]
+script=ExtResource("1_canvas")
+
+[node name="Line2D" type="Line2D" parent="."]
+width=6.0
+default_color=Color(0.2, 0.8, 1.0, 1.0)
+joint_mode=1
+begin_cap_mode=1
+end_cap_mode=1

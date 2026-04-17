@@ -1,0 +1,91 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/shop/shop.gd" id="1_shop"]
+
+[node name="Shop" type="Control"]
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1_shop")
+
+[node name="TopBar" type="HBoxContainer" parent="."]
+anchor_right=1.0
+offset_left=16.0
+offset_right=-16.0
+offset_top=8.0
+offset_bottom=56.0
+theme_override_constants/separation=16
+
+[node name="GoldLabel" type="Label" parent="TopBar"]
+size_flags_horizontal=3
+theme_override_font_sizes/font_size=28
+text="🪙 0"
+
+[node name="StockLabel" type="Label" parent="TopBar"]
+size_flags_horizontal=3
+horizontal_alignment=2
+theme_override_font_sizes/font_size=28
+text="🧪 0"
+
+[node name="ShelfArea" type="Control" parent="."]
+anchor_left=0.0
+anchor_right=1.0
+anchor_top=0.15
+anchor_bottom=0.45
+offset_left=16.0
+offset_right=-16.0
+
+[node name="ShelfBack" type="ColorRect" parent="ShelfArea"]
+anchor_right=1.0
+anchor_bottom=1.0
+color=Color(0.25, 0.15, 0.08, 1.0)
+
+[node name="Shelf" type="HBoxContainer" parent="ShelfArea"]
+anchor_right=1.0
+anchor_bottom=1.0
+offset_left=12.0
+offset_right=-12.0
+offset_top=12.0
+offset_bottom=-12.0
+theme_override_constants/separation=8
+alignment=1
+
+[node name="EmptyLabel" type="Label" parent="ShelfArea"]
+anchor_right=1.0
+anchor_bottom=1.0
+horizontal_alignment=1
+vertical_alignment=1
+theme_override_font_sizes/font_size=20
+text="Empty — go brew! 🧪"
+modulate=Color(1.0, 0.4, 0.3, 0.85)
+visible=true
+
+[node name="CustomerRow" type="HBoxContainer" parent="."]
+anchor_left=0.0
+anchor_right=1.0
+anchor_top=0.47
+anchor_bottom=0.80
+offset_left=16.0
+offset_right=-16.0
+theme_override_constants/separation=16
+alignment=1
+size_flags_vertical=3
+
+[node name="FeedbackLabel" type="Label" parent="."]
+anchor_left=0.0
+anchor_right=1.0
+anchor_top=0.80
+anchor_bottom=0.80
+offset_bottom=40.0
+horizontal_alignment=1
+theme_override_font_sizes/font_size=22
+text=""
+visible=false
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time=8.0
+autostart=true
+
+[node name="TrickleTimer" type="Timer" parent="."]
+wait_time=10.0
+autostart=true
+

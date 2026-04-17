@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/offline_summary/offline_summary.gd" id="1_summary"]
+
+[node name="OfflineSummary" type="Control"]
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1_summary")
+visible=false
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchor_right=1.0
+anchor_bottom=1.0
+color=Color(0.0, 0.0, 0.0, 0.6)
+mouse_filter=0
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_left=0.1
+anchor_right=0.9
+anchor_top=0.25
+anchor_bottom=0.75
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+anchors_preset=15
+anchor_right=1.0
+anchor_bottom=1.0
+offset_left=24.0
+offset_top=24.0
+offset_right=-24.0
+offset_bottom=-24.0
+theme_override_constants/separation=16
+
+[node name="Title" type="Label" parent="Panel/VBox"]
+size_flags_horizontal=3
+horizontal_alignment=1
+theme_override_font_sizes/font_size=22
+text="While you were away..."
+
+[node name="Body" type="Label" parent="Panel/VBox"]
+size_flags_vertical=3
+autowrap_mode=2
+theme_override_font_sizes/font_size=18
+text=""
+
+[node name="CloseBtn" type="Button" parent="Panel/VBox"]
+text="Collect & Continue ✨"
+theme_override_font_sizes/font_size=18

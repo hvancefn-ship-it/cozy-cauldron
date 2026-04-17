@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://cfqitf3pht0cn"]
+
+[ext_resource type="Script" uid="uid://idwqw8ouqw2v" path="res://scenes/main/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/cauldron/cauldron.tscn" id="2_cauldron"]
+[ext_resource type="PackedScene" path="res://scenes/scroll/scroll.tscn" id="3_scroll"]
+[ext_resource type="PackedScene" path="res://scenes/brew_hud/brew_hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://scenes/shop/shop.tscn" id="5_shop"]
+[ext_resource type="PackedScene" path="res://scenes/bottom_nav/bottom_nav.tscn" id="6_nav"]
+[ext_resource type="PackedScene" path="res://scenes/training/training.tscn" id="7_training"]
+[ext_resource type="PackedScene" path="res://scenes/upgrades/upgrades.tscn" id="8_upgrades"]
+[ext_resource type="PackedScene" path="res://scenes/gnome/gnome_manager.tscn" id="9_gnomes"]
+[ext_resource type="PackedScene" path="res://scenes/prestige/prestige.tscn" id="10_prestige"]
+[ext_resource type="PackedScene" path="res://scenes/onboarding/onboarding.tscn" id="11_onboarding"]
+[ext_resource type="PackedScene" path="res://scenes/slime_harvest/slime_harvest.tscn" id="12_slime"]
+[ext_resource type="PackedScene" path="res://scenes/offline_summary/offline_summary.tscn" id="13_summary"]
+[ext_resource type="PackedScene" path="res://scenes/settings/settings.tscn" id="14_settings"]
+
+[node name="Main" type="Control" unique_id=37280897]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="." unique_id=662029521]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.12, 0.08, 0.05, 1)
+
+[node name="GnomeManager" parent="." unique_id=766832229 instance=ExtResource("9_gnomes")]
+anchors_preset = 0
+offset_bottom = -80.0
+
+[node name="Cauldron" parent="." unique_id=643821181 instance=ExtResource("2_cauldron")]
+anchors_preset = 0
+offset_bottom = -80.0
+
+[node name="Scroll" parent="." unique_id=414238176 instance=ExtResource("3_scroll")]
+anchors_preset = 0
+offset_bottom = -80.0
+
+[node name="BrewHUD" parent="." unique_id=667200749 instance=ExtResource("4_hud")]
+anchors_preset = 0
+
+[node name="Shop" parent="." unique_id=2058235501 instance=ExtResource("5_shop")]
+anchors_preset = 0
+offset_bottom = -80.0
+
+[node name="Upgrades" parent="." unique_id=2054032644 instance=ExtResource("8_upgrades")]
+anchors_preset = 0
+offset_bottom = -80.0
+
+[node name="Prestige" parent="." unique_id=399765142 instance=ExtResource("10_prestige")]
+anchors_preset = 0
+offset_bottom = -80.0
+
+[node name="BottomNav" parent="." unique_id=2133666044 instance=ExtResource("6_nav")]
+anchors_preset = 0
+
+[node name="Training" parent="." unique_id=497556903 instance=ExtResource("7_training")]
+anchors_preset = 0
+
+[node name="Onboarding" parent="." unique_id=1985214069 instance=ExtResource("11_onboarding")]
+anchors_preset = 0
+
+[node name="SlimeHarvest" parent="." unique_id=112963124 instance=ExtResource("12_slime")]
+anchors_preset = 0
+offset_bottom = -80.0
+
+[node name="OfflineSummary" parent="." instance=ExtResource("13_summary")]
+
+[node name="Settings" parent="." instance=ExtResource("14_settings")]
+
+[node name="SettingsBtn" type="Button" parent="."]
+layout_mode = 0
+anchor_right = 0.0
+anchor_top = 0.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 52.0
+offset_bottom = 52.0
+text = "⚙️"
+flat = true
+theme_override_font_sizes/font_size = 24
+

@@ -1,0 +1,157 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/training/training.gd" id="1_training"]
+[ext_resource type="PackedScene" path="res://scenes/drawing_canvas/drawing_canvas.tscn" id="2_canvas"]
+
+[node name="Training" type="Control"]
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1_training")
+visible=false
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right=1.0
+anchor_bottom=1.0
+color=Color(0.08, 0.06, 0.04, 1.0)
+mouse_filter=2
+
+[node name="GhostLine" type="Line2D" parent="."]
+## Ghost of the target symbol — drawn behind the canvas
+default_color=Color(0.9, 0.75, 0.4, 0.35)
+width=12.0
+joint_mode=1
+begin_cap_mode=1
+end_cap_mode=1
+
+[node name="DrawingCanvas" parent="." instance=ExtResource("2_canvas")]
+
+[node name="CloseBtn" type="Button" parent="."]
+## Close button — fixed top-right corner
+offset_left=476.0
+offset_top=8.0
+offset_right=532.0
+offset_bottom=52.0
+text="✕ Close"
+theme_override_font_sizes/font_size=18
+
+[node name="DrawLabel" type="Label" parent="."]
+anchor_left=0.1
+anchor_right=0.9
+anchor_top=0.08
+anchor_bottom=0.08
+offset_bottom=30.0
+horizontal_alignment=1
+modulate=Color(1,1,1,0.3)
+text="Draw symbol here"
+theme_override_font_sizes/font_size=18
+
+[node name="Divider" type="ColorRect" parent="."]
+anchor_left=0.0
+anchor_right=1.0
+anchor_top=0.53
+anchor_bottom=0.53
+offset_bottom=2.0
+color=Color(0.4, 0.3, 0.2, 0.6)
+
+[node name="Panel" type="Control" parent="."]
+anchor_left=0.0
+anchor_right=1.0
+anchor_top=0.53
+anchor_bottom=1.0
+offset_bottom=-80.0
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+anchor_right=1.0
+anchor_bottom=1.0
+offset_left=20.0
+offset_right=-20.0
+offset_top=10.0
+offset_bottom=-10.0
+theme_override_constants/separation=8
+
+[node name="ResultLabel" type="Label" parent="Panel/VBox"]
+theme_override_font_sizes/font_size=20
+text=""
+
+[node name="ScoreLabel" type="Label" parent="Panel/VBox"]
+theme_override_font_sizes/font_size=18
+text=""
+
+[node name="ThresholdRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation=8
+
+[node name="ThresholdTitle" type="Label" parent="Panel/VBox/ThresholdRow"]
+## Changes to "SymbolName:" when that symbol has a custom threshold
+text="Global:"
+theme_override_font_sizes/font_size=16
+vertical_alignment=1
+
+[node name="ThresholdSlider" type="HSlider" parent="Panel/VBox/ThresholdRow"]
+size_flags_horizontal=3
+min_value=0.0
+max_value=1.0
+step=0.01
+value=0.60
+
+[node name="ThresholdValueLabel" type="Label" parent="Panel/VBox/ThresholdRow"]
+custom_minimum_size=Vector2(44, 0)
+text="0.60"
+theme_override_font_sizes/font_size=16
+
+[node name="ResetBtn" type="Button" parent="Panel/VBox/ThresholdRow"]
+## Clears per-symbol override, falls back to global
+text="↺"
+theme_override_font_sizes/font_size=16
+disabled=true
+tooltip_text="Reset to global threshold"
+
+[node name="SymbolOption" type="OptionButton" parent="Panel/VBox"]
+theme_override_font_sizes/font_size=20
+
+[node name="TrainedLabel" type="Label" parent="Panel/VBox"]
+theme_override_font_sizes/font_size=15
+modulate=Color(1,1,1,0.6)
+text="PASS examples: 0"
+
+[node name="BadTrainedLabel" type="Label" parent="Panel/VBox"]
+theme_override_font_sizes/font_size=15
+modulate=Color(1,0.8,0.8,0.75)
+text="FAIL examples: 0"
+
+[node name="ModeToggle" type="CheckButton" parent="Panel/VBox"]
+text="Save as FAIL example"
+
+theme_override_font_sizes/font_size=16
+
+[node name="ButtonRow" type="HBoxContainer" parent="Panel/VBox"]
+theme_override_constants/separation=8
+
+[node name="SaveBtn" type="Button" parent="Panel/VBox/ButtonRow"]
+size_flags_horizontal=3
+text="💾 Save"
+theme_override_font_sizes/font_size=18
+
+[node name="ClearBtn" type="Button" parent="Panel/VBox/ButtonRow"]
+size_flags_horizontal=3
+text="🗑 Clear"
+theme_override_font_sizes/font_size=18
+
+[node name="DeleteBtn" type="Button" parent="Panel/VBox/ButtonRow"]
+size_flags_horizontal=3
+text="❌ Delete PASS"
+theme_override_font_sizes/font_size=18
+
+[node name="DeleteBadBtn" type="Button" parent="Panel/VBox/ButtonRow"]
+size_flags_horizontal=3
+text="⛔ Delete FAIL"
+theme_override_font_sizes/font_size=18
+
+[node name="ExportBtn" type="Button" parent="Panel/VBox"]
+text="📋 Export Trained → Output"
+theme_override_font_sizes/font_size=17
+
+[node name="StatusLabel" type="Label" parent="Panel/VBox"]
+autowrap_mode=2
+theme_override_font_sizes/font_size=16
+text="Draw a symbol above"
+modulate=Color(1,1,1,0.65)

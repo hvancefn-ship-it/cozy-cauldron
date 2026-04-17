@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/onboarding/onboarding.gd" id="1_onboarding"]
+
+[node name="Onboarding" type="Control"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+script = ExtResource("1_onboarding")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.55)
+mouse_filter = 1
+
+[node name="Panel" type="Panel" parent="Backdrop"]
+anchor_left = 0.08
+anchor_top = 0.22
+anchor_right = 0.92
+anchor_bottom = 0.82
+
+[node name="VBox" type="VBoxContainer" parent="Backdrop/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Backdrop/Panel/VBox"]
+text = "Welcome"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="Body" type="RichTextLabel" parent="Backdrop/Panel/VBox"]
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+text = "Body"
+
+[node name="ButtonRow" type="HBoxContainer" parent="Backdrop/Panel/VBox"]
+alignment = 2
+
+[node name="SkipBtn" type="Button" parent="Backdrop/Panel/VBox/ButtonRow"]
+text = "Skip"
+
+[node name="NextBtn" type="Button" parent="Backdrop/Panel/VBox/ButtonRow"]
+text = "Next"

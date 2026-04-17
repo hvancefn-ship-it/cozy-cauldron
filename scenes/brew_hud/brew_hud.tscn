@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/brew_hud/brew_hud.gd" id="1_hud"]
+
+[node name="BrewHUD" type="Control"]
+anchor_right=1.0
+offset_bottom=80.0
+script=ExtResource("1_hud")
+visible=false
+
+[node name="HBoxOuter" type="HBoxContainer" parent="."]
+anchor_right=1.0
+anchor_bottom=1.0
+offset_left=16.0
+offset_right=-16.0
+offset_top=16.0
+offset_bottom=-8.0
+
+[node name="SymbolRow" type="HBoxContainer" parent="HBoxOuter"]
+size_flags_horizontal=3
+theme_override_constants/separation=10
+
+[node name="Spacer" type="Control" parent="HBoxOuter"]
+size_flags_horizontal=3
+
+[node name="MissRow" type="HBoxContainer" parent="HBoxOuter"]
+alignment=2
+theme_override_constants/separation=10

@@ -1,0 +1,63 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/scroll/scroll.gd" id="1_scroll"]
+[ext_resource type="PackedScene" path="res://scenes/drawing_canvas/drawing_canvas.tscn" id="2_canvas"]
+
+[node name="Scroll" type="Control"]
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1_scroll")
+visible=false
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_left=0.15
+anchor_right=0.85
+anchor_top=0.10
+anchor_bottom=0.62
+color=Color(0.82, 0.71, 0.55, 0.96)
+
+[node name="GhostLine" type="Line2D" parent="."]
+default_color=Color(0.35, 0.25, 0.1, 0.28)
+width=10.0
+joint_mode=1
+begin_cap_mode=1
+end_cap_mode=1
+
+[node name="DrawingCanvas" parent="." instance=ExtResource("2_canvas")]
+
+[node name="SymbolNameLabel" type="Label" parent="."]
+anchor_left=0.15
+anchor_right=0.85
+anchor_top=0.10
+anchor_bottom=0.10
+offset_top=6.0
+offset_bottom=40.0
+horizontal_alignment=1
+theme_override_font_sizes/font_size=24
+text=""
+
+[node name="ScoreLabel" type="Label" parent="."]
+## Debug score — shows best match % and name after each stroke
+anchor_left=0.15
+anchor_right=0.85
+anchor_top=0.57
+anchor_bottom=0.57
+offset_bottom=32.0
+horizontal_alignment=1
+theme_override_font_sizes/font_size=18
+text=""
+visible=false
+
+[node name="ResultLabel" type="Label" parent="."]
+anchor_left=0.5
+anchor_right=0.5
+anchor_top=0.36
+anchor_bottom=0.36
+offset_left=-60.0
+offset_right=60.0
+offset_top=-55.0
+offset_bottom=55.0
+horizontal_alignment=1
+vertical_alignment=1
+theme_override_font_sizes/font_size=96
+text=""

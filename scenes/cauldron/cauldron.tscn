@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/cauldron/cauldron.gd" id="1_cauldron"]
+
+[node name="Cauldron" type="Control"]
+anchor_right=1.0
+anchor_bottom=1.0
+script=ExtResource("1_cauldron")
+
+[node name="Label" type="Label" parent="."]
+anchor_left=0.25
+anchor_right=0.75
+anchor_top=0.64
+anchor_bottom=0.64
+offset_bottom=36.0
+horizontal_alignment=1
+theme_override_font_sizes/font_size=20
+text="Tap to brew!"
+
+[node name="CauldronRect" type="ColorRect" parent="."]
+anchor_left=0.25
+anchor_right=0.75
+anchor_top=0.67
+anchor_bottom=0.94
+color=Color(0.15, 0.1, 0.2, 1.0)
+
+[node name="FlashRect" type="ColorRect" parent="."]
+anchor_left=0.25
+anchor_right=0.75
+anchor_top=0.67
+anchor_bottom=0.94
+color=Color(0.0, 0.0, 0.0, 0.0)
+mouse_filter=2
