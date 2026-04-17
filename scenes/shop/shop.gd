@@ -191,7 +191,7 @@ func _on_customer_served(amount: int, customer: Customer) -> void:
 	gold_changed.emit(gold)
 	customer._serve_success()
 	AudioManager.play_sfx("sfx_gold_earn")
-	_show_feedback("+%d gold 🪙" % earned, Color.GREEN)
+	_show_feedback("+%d gold 🪙" % earned, Color.GREEN, true)
 	_refresh_ui()
 
 
@@ -216,19 +216,20 @@ func _on_trickle() -> void:
 	_refresh_ui()
 
 
-func _show_feedback(msg: String, color: Color = Color.WHITE) -> void:
+func _show_feedback(msg: String, color: Color = Color.WHITE, pop_gold: bool = false) -> void:
 	_feedback_label.text = msg
 	_feedback_label.add_theme_color_override("font_color", color)
 	_feedback_label.visible = true
 	_feedback_label.modulate.a = 1.0
 
 	_feedback_label.scale = Vector2.ONE * 0.9
-	_gold_label.scale = Vector2.ONE
 	var pop := create_tween()
 	pop.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	pop.tween_property(_feedback_label, "scale", Vector2.ONE, 0.14)
-	pop.parallel().tween_property(_gold_label, "scale", Vector2.ONE * 1.12, 0.08)
-	pop.tween_property(_gold_label, "scale", Vector2.ONE, 0.10)
+	if pop_gold:
+		_gold_label.scale = Vector2.ONE
+		pop.parallel().tween_property(_gold_label, "scale", Vector2.ONE * 1.12, 0.08)
+		pop.tween_property(_gold_label, "scale", Vector2.ONE, 0.10)
 
 	var tween := create_tween()
 	tween.tween_interval(1.6)

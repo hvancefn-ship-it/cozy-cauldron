@@ -111,6 +111,10 @@ func _on_tab_selected(index: int) -> void:
 
 
 func _show_tab(index: int) -> void:
+	# If leaving Brew tab mid-brew, abort cleanly
+	if _active_tab == TAB_BREW and index != TAB_BREW:
+		_cauldron.abort_brew()
+
 	_active_tab = index
 	Main.current_tab = index
 

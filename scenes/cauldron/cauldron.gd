@@ -190,6 +190,20 @@ func _finish_brew(success: bool) -> void:
 		potion_exploded.emit()
 
 	await get_tree().create_timer(2.0).timeout
+	if not _brewing:
+		_label.text = "Tap to brew!"
+
+
+## Called by Main when player switches away from Brew tab mid-brew.
+## Safely aborts the current brew so it doesn't lock up on return.
+func abort_brew() -> void:
+	if not _brewing:
+		return
+	_brewing = false
+	_scroll.dismiss()
+	_restore_thresholds()
+	if _hud:
+		_hud.hide_hud()
 	_label.text = "Tap to brew!"
 
 
