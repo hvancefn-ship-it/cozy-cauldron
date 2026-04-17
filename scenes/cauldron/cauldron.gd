@@ -13,7 +13,9 @@ signal potion_exploded()
 signal symbol_matched(index: int, total: int)
 signal symbol_missed(miss_count: int)
 
-@onready var _bg: ColorRect    = $CauldronRect
+@onready var _bg: TextureRect  = $CauldronRect
+
+const CAULDRON_TEX_PATH := "res://assets/cauldron.png"
 @onready var _flash: ColorRect = $FlashRect
 @onready var _label: Label     = $Label
 
@@ -33,6 +35,11 @@ var _autocomplete: bool = false
 func _ready() -> void:
 	_flash.color = Color(0, 0, 0, 0)
 	_label.text = "Tap to brew!"
+	if ResourceLoader.exists(CAULDRON_TEX_PATH):
+		_bg.texture = load(CAULDRON_TEX_PATH)
+	else:
+		# Fallback placeholder until editor imports the PNG
+		_bg.self_modulate = Color(0.15, 0.1, 0.2, 1.0)
 
 
 func set_scroll(scroll: Scroll) -> void:

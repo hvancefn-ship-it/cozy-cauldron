@@ -8,6 +8,7 @@ signal gnome_event(text: String, gold: int)
 
 @onready var _gnome_row: HBoxContainer = $GnomeRow
 @onready var _event_label: Label       = $EventLabel
+@onready var _orc_sprite: TextureRect  = $OrcManagerSprite
 
 const GnomeScene := preload("res://scenes/gnome/gnome.tscn")
 
@@ -17,11 +18,25 @@ var _gnomes: Array[Gnome] = []
 func _ready() -> void:
 	UpgradeManager.upgrade_purchased.connect(_on_upgrade_purchased)
 	_sync_gnomes()
+	_refresh_orc_sprite()
 
 
 func _on_upgrade_purchased(id: String) -> void:
 	if id == "gnome_slots":
 		_sync_gnomes()
+	if id == "manager_orc":
+		_refresh_orc_sprite()
+
+
+func _refresh_orc_sprite() -> void:
+	const ORC_TEX_PATH := "res://assets/orc_manager.png"
+	if _orc_sprite.texture == null and ResourceLoader.exists(ORC_TEX_PATH):
+		_orc_sprite.texture = load(ORC_TEX_PATH)
+	var unlocked: bool = UpgradeManager.get_level("manager_orc") > 0
+	var target_alpha: float = 1.0 if unlocked else 0.0
+	if _orc_sprite.modulate.a != target_alpha:
+		var t := create_tween()
+		t.tween_property(_orc_sprite, "modulate:a", target_alpha, 0.5)
 
 
 func _sync_gnomes() -> void:

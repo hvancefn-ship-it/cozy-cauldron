@@ -8,26 +8,27 @@ anchor_bottom=1.0
 script=ExtResource("1_cauldron")
 
 [node name="Label" type="Label" parent="."]
-anchor_left=0.25
-anchor_right=0.75
-anchor_top=0.64
-anchor_bottom=0.64
+anchor_left=0.1
+anchor_right=0.9
+anchor_top=0.62
+anchor_bottom=0.62
 offset_bottom=36.0
 horizontal_alignment=1
 theme_override_font_sizes/font_size=20
 text="Tap to brew!"
 
-[node name="CauldronRect" type="ColorRect" parent="."]
-anchor_left=0.25
-anchor_right=0.75
-anchor_top=0.67
-anchor_bottom=0.94
-color=Color(0.15, 0.1, 0.2, 1.0)
+[node name="CauldronRect" type="TextureRect" parent="."]
+anchor_left=0.1
+anchor_right=0.9
+anchor_top=0.65
+anchor_bottom=0.95
+stretch_mode=5
+expand_mode=1
 
 [node name="FlashRect" type="ColorRect" parent="."]
-anchor_left=0.25
-anchor_right=0.75
-anchor_top=0.67
-anchor_bottom=0.94
+anchor_left=0.1
+anchor_right=0.9
+anchor_top=0.65
+anchor_bottom=0.95
 color=Color(0.0, 0.0, 0.0, 0.0)
 mouse_filter=2
