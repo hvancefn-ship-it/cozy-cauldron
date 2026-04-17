@@ -43,3 +43,13 @@ text = "Slime: 0"
 [node name="CloseBtn" type="Button" parent="TopBar"]
 text = "Back"
 visible = false
+
+[node name="OrcManagerSprite" type="TextureRect" parent="."]
+anchor_left = 0.7
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 64.0
+offset_bottom = -80.0
+stretch_mode = 5
+expand_mode = 1
+modulate = Color(1, 1, 1, 0)
