@@ -79,7 +79,7 @@ func _ready() -> void:
 	_apply_offline_idle_progress()
 	AdMobBridge.no_ads_purchased.connect(_on_no_ads_granted)
 	AdMobBridge.no_ads_restored.connect(_on_no_ads_granted)
-	_apply_banner_safe_zone()
+	AdMobBridge.banner_visibility_changed.connect(_on_banner_visibility_changed)
 	_sync_ad_boost_ui()
 	if _offline_elapsed_seconds > 60:
 		_offline_summary.show_summary(
@@ -273,12 +273,15 @@ func _on_no_ads_granted() -> void:
 	_apply_banner_safe_zone()
 
 
-func _apply_banner_safe_zone() -> void:
+func _on_banner_visibility_changed(is_visible: bool) -> void:
+	_apply_banner_safe_zone(is_visible)
+
+
+func _apply_banner_safe_zone(banner_visible: bool = false) -> void:
 	## Shift game content down by banner height when banner is showing.
 	## AdMob banner is an OS-level overlay; without this it covers top content.
 	const BANNER_HEIGHT := 90
-	var has_banner: bool = not AdMobBridge.no_ads and AdMobBridge._banner_showing
-	var top_offset: float = float(BANNER_HEIGHT) if has_banner else 0.0
+	var top_offset: float = float(BANNER_HEIGHT) if banner_visible else 0.0
 	for child in get_children():
 		if child == _bottom_nav or child == _settings or child == _settings_btn:
 			continue

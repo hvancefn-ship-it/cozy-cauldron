@@ -6,6 +6,7 @@ signal rewarded_ad_completed()
 signal rewarded_ad_failed()
 signal no_ads_purchased()
 signal no_ads_restored()
+signal banner_visibility_changed(visible: bool)
 
 # ── Ad Unit IDs ────────────────────────────────────────────────────────────
 const REWARDED_AD_UNIT_ID_ANDROID := "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX"  # ← replace
@@ -20,10 +21,13 @@ const TEST_BANNER_ANDROID   := "ca-app-pub-3940256099942544/6300978111"
 const TEST_BANNER_IOS       := "ca-app-pub-3940256099942544/2934735716"
 
 const SETTINGS_PATH := "user://settings.json"
+const BANNER_ON_SECONDS  := 45.0
+const BANNER_OFF_SECONDS := 90.0
 
 var _admob: Node = null
 var _ad_loaded: bool = false
 var _banner_showing: bool = false
+var _banner_cycle_timer: Timer = null
 var _pending_callback: Callable = Callable()
 var _use_test_ads: bool = true  # ← flip to false before release
 
@@ -35,7 +39,7 @@ func _ready() -> void:
 	_load_no_ads()
 	_try_init_admob()
 	if not no_ads:
-		show_banner()
+		_start_banner_cycle()
 
 
 func _try_init_admob() -> void:
@@ -61,41 +65,82 @@ func _try_init_admob() -> void:
 	_load_rewarded_ad()
 
 
-# ── Banner ──────────────────────────────────────────────────────────────────
+# ── Banner cycle ────────────────────────────────────────────────────────────
 
-func show_banner() -> void:
+func _start_banner_cycle() -> void:
+	if no_ads:
+		return
+	if _banner_cycle_timer != null:
+		return
+	_banner_cycle_timer = Timer.new()
+	_banner_cycle_timer.one_shot = true
+	add_child(_banner_cycle_timer)
+	_banner_cycle_timer.timeout.connect(_on_banner_cycle_tick)
+	# Start with the banner hidden — first show after OFF_SECONDS
+	_banner_cycle_timer.start(BANNER_OFF_SECONDS)
+
+
+func _stop_banner_cycle() -> void:
+	if _banner_cycle_timer == null:
+		return
+	_banner_cycle_timer.stop()
+	_banner_cycle_timer.queue_free()
+	_banner_cycle_timer = null
+
+
+func _on_banner_cycle_tick() -> void:
+	if no_ads:
+		return
+	if _banner_showing:
+		_hide_banner_internal()
+		_banner_cycle_timer.start(BANNER_OFF_SECONDS)
+	else:
+		_show_banner_internal()
+		_banner_cycle_timer.start(BANNER_ON_SECONDS)
+
+
+func _show_banner_internal() -> void:
 	if no_ads or _banner_showing:
 		return
 	if _admob == null:
-		return  # Stub: no banner in editor
+		# Stub — notify Main so it can adjust layout
+		_banner_showing = true
+		banner_visibility_changed.emit(true)
+		return
 	_admob.load_banner_ad(
 		_get_banner_id(),
 		_admob.BANNER_SIZE_SMART,
-		_admob.BANNER_POSITION_TOP   # TOP so it never overlaps the bottom nav
+		_admob.BANNER_POSITION_TOP
 	)
 	_banner_showing = true
+	banner_visibility_changed.emit(true)
 
 
-func hide_banner() -> void:
-	if not _banner_showing or _admob == null:
+func _hide_banner_internal() -> void:
+	if not _banner_showing:
 		return
-	if _admob.has_method("hide_banner_ad"):
-		_admob.hide_banner_ad()
-	elif _admob.has_method("destroy_banner_ad"):
-		_admob.destroy_banner_ad()
+	if _admob != null:
+		if _admob.has_method("hide_banner_ad"):
+			_admob.hide_banner_ad()
+		elif _admob.has_method("destroy_banner_ad"):
+			_admob.destroy_banner_ad()
 	_banner_showing = false
+	banner_visibility_changed.emit(false)
+
+
+## Called when no-ads is granted — stops the cycle and hides immediately.
+func hide_banner() -> void:
+	_stop_banner_cycle()
+	_hide_banner_internal()
 
 
 func _on_banner_loaded() -> void:
-	pass  # Banner auto-shows after load
+	pass  # Banner auto-shows after load plugin-side
 
 
 func _on_banner_failed(_error: Dictionary) -> void:
 	_banner_showing = false
-	# Retry after 60s
-	await get_tree().create_timer(60.0).timeout
-	if not no_ads:
-		show_banner()
+	banner_visibility_changed.emit(false)
 
 
 # ── Rewarded ────────────────────────────────────────────────────────────────
