@@ -13,7 +13,7 @@ signal gold_changed(new_total: int)
 @onready var _gold_label: Label           = $TopBar/GoldLabel
 @onready var _stock_label: Label          = $TopBar/StockLabel
 @onready var _ratfolk_sprite: Control     = $RatfolkSprite
-@onready var _shelf: HBoxContainer        = $ShelfArea/Shelf
+@onready var _shelf: Control              = $ShelfArea/Shelf
 @onready var _customer_row: HBoxContainer = $CustomerRow
 @onready var _feedback_label: Label       = $FeedbackLabel
 @onready var _spawn_timer: Timer          = $SpawnTimer
@@ -256,14 +256,7 @@ func _refresh_ui() -> void:
 	_gold_label.text = "🪙 %d" % gold
 	_stock_label.text = "🧪 %d" % _shelf_stock
 
-	for ch in _shelf.get_children():
-		ch.queue_free()
 	var max_slots: int = 8 + int(UpgradeManager.get_value("shop_shelf"))
-	var visible_stock: int = min(_shelf_stock, max_slots)
-	for _i in range(visible_stock):
-		var dot := ColorRect.new()
-		dot.custom_minimum_size = Vector2(36, 56)
-		dot.color = Color(0.4, 0.15, 0.55, 1.0)
-		_shelf.add_child(dot)
-
+	if _shelf.has_method("set_stock"):
+		_shelf.call("set_stock", _shelf_stock, max_slots)
 	_empty_label.visible = _shelf_stock == 0

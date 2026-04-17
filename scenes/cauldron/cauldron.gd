@@ -15,7 +15,9 @@ signal symbol_missed(miss_count: int)
 
 @onready var _bg: TextureRect  = $CauldronRect
 
-const CAULDRON_TEX_PATH := "res://assets/cauldron.png"
+const CAULDRON_TEX_PATH  := "res://assets/cauldron_strip3.png"
+const CAULDRON_FRAMES    := 3
+const CAULDRON_FRAME_W   := 48
 @onready var _flash: ColorRect = $FlashRect
 @onready var _label: Label     = $Label
 
@@ -36,10 +38,35 @@ func _ready() -> void:
 	_flash.color = Color(0, 0, 0, 0)
 	_label.text = "Tap to brew!"
 	if ResourceLoader.exists(CAULDRON_TEX_PATH):
-		_bg.texture = load(CAULDRON_TEX_PATH)
+		_setup_cauldron_sprite()
 	else:
-		# Fallback placeholder until editor imports the PNG
 		_bg.self_modulate = Color(0.15, 0.1, 0.2, 1.0)
+
+
+func _setup_cauldron_sprite() -> void:
+	var tex: Texture2D = load(CAULDRON_TEX_PATH)
+	if tex == null:
+		return
+	# Replace TextureRect with AnimatedSprite2D for proper frame animation
+	var sprite := AnimatedSprite2D.new()
+	var sf := SpriteFrames.new()
+	sf.clear_all()
+	sf.add_animation("idle")
+	sf.set_animation_loop("idle", true)
+	sf.set_animation_speed("idle", 4.0)
+	for i in CAULDRON_FRAMES:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(i * CAULDRON_FRAME_W, 0, CAULDRON_FRAME_W, CAULDRON_FRAME_W)
+		sf.add_frame("idle", atlas)
+	sprite.sprite_frames = sf
+	# Position centered inside the TextureRect bounds
+	var rect := _bg.get_rect()
+	sprite.position = Vector2(rect.size.x * 0.5, rect.size.y * 0.5)
+	sprite.scale = Vector2(rect.size.x / float(CAULDRON_FRAME_W), rect.size.y / float(CAULDRON_FRAME_W))
+	sprite.play("idle")
+	_bg.add_child(sprite)
+	_bg.texture = null  # hide the TextureRect's own image
 
 
 func set_scroll(scroll: Scroll) -> void:
