@@ -8,6 +8,7 @@ signal gnome_event(text: String, gold: int)
 
 @onready var _gnome_row: HBoxContainer = $GnomeRow
 @onready var _event_label: Label       = $EventLabel
+@onready var _gnome_sprite: Control    = $GnomeManagerSprite
 
 const GnomeScene := preload("res://scenes/gnome/gnome.tscn")
 
@@ -17,11 +18,22 @@ var _gnomes: Array[Gnome] = []
 func _ready() -> void:
 	UpgradeManager.upgrade_purchased.connect(_on_upgrade_purchased)
 	_sync_gnomes()
+	_refresh_gnome_sprite()
 
 
 func _on_upgrade_purchased(id: String) -> void:
 	if id == "gnome_slots":
 		_sync_gnomes()
+	if id == "manager_gnome":
+		_refresh_gnome_sprite()
+
+
+func _refresh_gnome_sprite() -> void:
+	var unlocked: bool = UpgradeManager.get_level("manager_gnome") > 0
+	var target: float = 1.0 if unlocked else 0.0
+	if _gnome_sprite.modulate.a != target:
+		var t := create_tween()
+		t.tween_property(_gnome_sprite, "modulate:a", target, 0.6)
 
 
 func _sync_gnomes() -> void:

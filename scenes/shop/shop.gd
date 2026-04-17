@@ -12,6 +12,7 @@ signal gold_changed(new_total: int)
 
 @onready var _gold_label: Label           = $TopBar/GoldLabel
 @onready var _stock_label: Label          = $TopBar/StockLabel
+@onready var _ratfolk_sprite: Control     = $RatfolkSprite
 @onready var _shelf: HBoxContainer        = $ShelfArea/Shelf
 @onready var _customer_row: HBoxContainer = $CustomerRow
 @onready var _feedback_label: Label       = $FeedbackLabel
@@ -33,6 +34,7 @@ func _ready() -> void:
 	_trickle_timer.timeout.connect(_on_trickle)
 	_trickle_timer.start()
 	UpgradeManager.upgrade_purchased.connect(_on_upgrade_purchased)
+	_refresh_ratfolk_sprite()
 	_refresh_ui()
 
 
@@ -40,8 +42,18 @@ func _on_upgrade_purchased(id: String) -> void:
 	match id:
 		"sell_spawn":
 			_apply_spawn_interval()
+		"manager_ratfolk":
+			_refresh_ratfolk_sprite()
 		_:
 			pass
+
+
+func _refresh_ratfolk_sprite() -> void:
+	var unlocked: bool = UpgradeManager.get_level("manager_ratfolk") > 0
+	var target: float = 1.0 if unlocked else 0.0
+	if _ratfolk_sprite.modulate.a != target:
+		var t := create_tween()
+		t.tween_property(_ratfolk_sprite, "modulate:a", target, 0.6)
 
 
 func _apply_spawn_interval() -> void:
