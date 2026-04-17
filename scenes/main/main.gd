@@ -77,6 +77,8 @@ func _ready() -> void:
 
 	_setup_manager_timers()
 	_apply_offline_idle_progress()
+	AdMobBridge.no_ads_purchased.connect(_on_no_ads_granted)
+	AdMobBridge.no_ads_restored.connect(_on_no_ads_granted)
 	_sync_ad_boost_ui()
 	if _offline_elapsed_seconds > 60:
 		_offline_summary.show_summary(
@@ -250,6 +252,9 @@ func _on_ad_reward_result(success: bool) -> void:
 
 
 func _ad_boost_multiplier_at(unix_time: int, stacks_override: int = -1, expiry_override: int = -1) -> float:
+	# No-ads IAP: permanent max boost, no timer needed
+	if AdMobBridge.no_ads:
+		return AD_BOOST_MULTIPLIER
 	var stacks: int = _ad_boost_stacks if stacks_override < 0 else stacks_override
 	var expiry: int = _ad_boost_expires_unix if expiry_override < 0 else expiry_override
 	if stacks <= 0:
@@ -257,6 +262,14 @@ func _ad_boost_multiplier_at(unix_time: int, stacks_override: int = -1, expiry_o
 	if unix_time >= expiry:
 		return 1.0
 	return AD_BOOST_MULTIPLIER
+
+
+func _on_no_ads_granted() -> void:
+	# Immediately apply permanent boost and refresh UI
+	_ad_boost_stacks = 2
+	_ad_boost_expires_unix = 0  # irrelevant — no_ads flag takes precedence
+	_update_manager_timer_rates()
+	_sync_ad_boost_ui()
 
 
 func _manager_global_eff() -> float:

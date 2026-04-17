@@ -8,6 +8,8 @@ signal closed()
 @onready var sfx_slider: HSlider = %SfxSlider
 @onready var haptics_off_btn: Button = %HapticsOffBtn
 @onready var haptics_on_btn: Button = %HapticsOnBtn
+@onready var no_ads_btn: Button = %NoAdsBtn
+@onready var restore_btn: Button = %RestoreBtn
 @onready var close_btn: Button = %CloseBtn
 
 
@@ -15,8 +17,11 @@ func _ready() -> void:
 	sfx_slider.value_changed.connect(_on_sfx_slider_changed)
 	haptics_off_btn.pressed.connect(_on_haptics_off_pressed)
 	haptics_on_btn.pressed.connect(_on_haptics_on_pressed)
+	no_ads_btn.pressed.connect(_on_no_ads_pressed)
+	restore_btn.pressed.connect(_on_restore_pressed)
 	close_btn.pressed.connect(_on_close_pressed)
-	# Defer so AudioManager is guaranteed ready before we read it
+	AdMobBridge.no_ads_purchased.connect(_refresh_ui)
+	AdMobBridge.no_ads_restored.connect(_refresh_ui)
 	_refresh_ui.call_deferred()
 
 
@@ -28,6 +33,10 @@ func open() -> void:
 func _refresh_ui() -> void:
 	sfx_slider.value = AudioManager.sfx_volume
 	_update_haptic_buttons(AudioManager.is_haptics_enabled())
+	var no_ads: bool = AdMobBridge.no_ads
+	no_ads_btn.disabled = no_ads
+	no_ads_btn.text = "⭐ Ads Removed — Thank You!" if no_ads else "Remove Ads — $0.99"
+	restore_btn.visible = not no_ads
 
 
 func _update_haptic_buttons(enabled: bool) -> void:
@@ -49,6 +58,17 @@ func _on_haptics_off_pressed() -> void:
 func _on_haptics_on_pressed() -> void:
 	AudioManager.set_haptics(true)
 	_update_haptic_buttons(true)
+
+
+func _on_no_ads_pressed() -> void:
+	# IAP stub — will route through IAPBridge when product ID is set.
+	# For now, directly grant (replace with real IAP call once product ID is ready).
+	AdMobBridge.grant_no_ads()
+
+
+func _on_restore_pressed() -> void:
+	# IAP restore stub.
+	AdMobBridge.restore_no_ads()
 
 
 func _on_close_pressed() -> void:

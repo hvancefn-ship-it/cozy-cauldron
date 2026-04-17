@@ -81,6 +81,23 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "ON"
 
+[node name="Divider" type="ColorRect" parent="Panel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.4, 0.35, 0.3, 0.5)
+
+[node name="NoAdsBtn" type="Button" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Remove Ads — $0.99"
+
+[node name="RestoreBtn" type="Button" parent="Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Restore Purchases"
+
 [node name="CloseBtn" type="Button" parent="Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2

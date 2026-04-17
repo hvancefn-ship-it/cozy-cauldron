@@ -200,6 +200,11 @@ func set_ad_boost_state(stacks: int, expires_unix: int) -> void:
 
 
 func _refresh_ad_boost_ui() -> void:
+	if AdMobBridge.no_ads:
+		_ad_boost_label.text = "⭐ Permanent +50% boost active (No Ads)"
+		_ad_boost_btn.text = "Already Active"
+		_ad_boost_btn.disabled = true
+		return
 	var now_unix: int = int(Time.get_unix_time_from_system())
 	if _ad_boost_expires_unix <= now_unix:
 		_ad_boost_stacks = 0
