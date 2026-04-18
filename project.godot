@@ -8,6 +8,11 @@
 
 config_version=5
 
+[admob]
+
+admob/app_id/android="ca-app-pub-7490319266490177~4523185667"
+admob/app_id/ios=""
+
 [application]
 
 config/name="Cozy Cauldron"
@@ -32,7 +37,7 @@ window/handheld/orientation="portrait"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/xogot_connect/plugin.cfg")
+enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/xogot_connect/plugin.cfg")
 
 [input_devices]
 
@@ -47,11 +52,6 @@ virtual_controller/ios/enable_button_y=true
 [physics]
 
 3d/physics_engine="Jolt Physics"
-
-[admob]
-
-admob/app_id/android="ca-app-pub-7490319266490177~4523185667"
-admob/app_id/ios=""
 
 [rendering]
 

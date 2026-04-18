@@ -91,12 +91,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Remove Ads — $0.99"
+visible = false
 
 [node name="RestoreBtn" type="Button" parent="Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Restore Purchases"
+visible = false
 
 [node name="CloseBtn" type="Button" parent="Panel/VBox"]
 unique_name_in_owner = true

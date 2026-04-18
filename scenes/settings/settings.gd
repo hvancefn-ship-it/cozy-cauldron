@@ -61,14 +61,13 @@ func _on_haptics_on_pressed() -> void:
 
 
 func _on_no_ads_pressed() -> void:
-	# IAP stub — will route through IAPBridge when product ID is set.
-	# For now, directly grant (replace with real IAP call once product ID is ready).
-	AdMobBridge.grant_no_ads()
+	# IAP not wired yet — button is hidden until Play Console product ID is set up.
+	pass
 
 
 func _on_restore_pressed() -> void:
-	# IAP restore stub.
-	AdMobBridge.restore_no_ads()
+	# IAP restore not wired yet.
+	pass
 
 
 func _on_close_pressed() -> void:
