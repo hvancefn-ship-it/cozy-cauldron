@@ -60,6 +60,8 @@ func _setup_cauldron_sprite() -> void:
 		atlas.region = Rect2(i * CAULDRON_FRAME_W, 0, CAULDRON_FRAME_W, CAULDRON_FRAME_W)
 		sf.add_frame("idle", atlas)
 	sprite.sprite_frames = sf
+	# Nearest-neighbor filtering — prevents pixel art blur when scaled up
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	# Position centered inside the TextureRect bounds
 	var rect := _bg.get_rect()
 	sprite.position = Vector2(rect.size.x * 0.5, rect.size.y * 0.5)

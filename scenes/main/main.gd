@@ -94,8 +94,10 @@ func _ready() -> void:
 	_show_tab(TAB_BREW)
 	_refresh_gold_views()
 
-	# First-run onboarding
-	if _onboarding.should_show():
+	# First-run onboarding — show if no save exists OR no upgrades purchased yet
+	var is_fresh_run: bool = not FileAccess.file_exists(IDLE_SAVE_PATH) or \
+		(UpgradeManager.get_level("sell_value_1") == 0 and _shop.get_gold() < 10)
+	if _onboarding.should_show() or is_fresh_run:
 		_onboarding.start()
 
 
@@ -396,8 +398,10 @@ func _on_prestige_completed(_new_level: int) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
-		_save_idle_state()
+	match what:
+		NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_PREDELETE, \
+		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
+			_save_idle_state()
 
 
 func _build_state_signature() -> String:
@@ -466,21 +470,23 @@ func _apply_offline_idle_progress() -> void:
 	if elapsed <= 0:
 		return
 
+	# Always restore core resources — gold, slime, stock are saved every close
+	var saved_gold: int = int(d.get("gold", 0))
+	var saved_slime: int = int(d.get("slime", 0))
+	var saved_stock: int = int(d.get("stock", 0))
+	_slime = saved_slime
+	if saved_stock > 0:
+		_shop.add_potions(saved_stock)
+	if saved_gold > 0:
+		_shop.set_gold_amount(saved_gold)
+
 	var has_gnome: bool = UpgradeManager.get_level("manager_gnome") > 0
 	var has_orc: bool = UpgradeManager.get_level("manager_orc") > 0
 	var has_ratfolk: bool = UpgradeManager.get_level("manager_ratfolk") > 0
 	if not has_gnome and not has_orc and not has_ratfolk:
+		_refresh_gold_views()
+		_prestige.set_gold(_shop.get_gold())
 		return
-
-	# Restore baseline resource state only if save signatures match.
-	var saved_sig: String = str(d.get("state_sig", ""))
-	var current_sig: String = _build_state_signature()
-	if saved_sig != "" and saved_sig == current_sig:
-		_slime = max(_slime, int(d.get("slime", _slime)))
-		var offline_stock: int = int(d.get("stock", _shop.get_stock()))
-		if offline_stock > _shop.get_stock():
-			_shop.add_potions(offline_stock - _shop.get_stock())
-		_shop.set_gold_amount(max(_shop.get_gold(), int(d.get("gold", _shop.get_gold()))))
 
 	var base_global_eff: float = clampf(0.35 + float(UpgradeManager.get_value("manager_offline_eff")), 0.2, 0.9)
 	var boosted_seconds: int = 0

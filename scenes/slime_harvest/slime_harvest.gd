@@ -70,6 +70,7 @@ func _refresh_orc_sprite() -> void:
 	const ORC_TEX_PATH := "res://assets/orc_manager.png"
 	if _orc_sprite.texture == null and ResourceLoader.exists(ORC_TEX_PATH):
 		_orc_sprite.texture = load(ORC_TEX_PATH)
+		_orc_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var unlocked: bool = UpgradeManager.get_level("manager_orc") > 0
 	var target_alpha: float = 1.0 if unlocked else 0.0
 	if _orc_sprite.modulate.a != target_alpha:
@@ -153,6 +154,7 @@ func _spawn_slimes() -> void:
 		s.set_meta("max_hp", hp)
 		# Sprite child — visual only (falls back gracefully if textures not imported yet)
 		var sprite := AnimatedSprite2D.new()
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		if idle_frames:
 			sprite.sprite_frames = idle_frames
 		sprite.scale = Vector2(r / 16.0, r / 16.0)
