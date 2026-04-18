@@ -9,6 +9,7 @@ signal no_ads_restored()
 signal banner_visibility_changed(visible: bool)
 
 # ── Ad Unit IDs ────────────────────────────────────────────────────────────
+const APP_ID_ANDROID := "ca-app-pub-7490319266490177~4523185667"
 const REWARDED_AD_UNIT_ID_ANDROID := "ca-app-pub-7490319266490177/5031511614"
 const REWARDED_AD_UNIT_ID_IOS     := "ca-app-pub-7490319266490177/5031511614"  # ← replace with iOS unit when ready
 const BANNER_AD_UNIT_ID_ANDROID   := "ca-app-pub-7490319266490177/6834501694"
