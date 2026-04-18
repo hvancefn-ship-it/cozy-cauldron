@@ -9,10 +9,10 @@ signal no_ads_restored()
 signal banner_visibility_changed(visible: bool)
 
 # ── Ad Unit IDs ────────────────────────────────────────────────────────────
-const REWARDED_AD_UNIT_ID_ANDROID := "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX"  # ← replace
-const REWARDED_AD_UNIT_ID_IOS     := "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX"  # ← replace
-const BANNER_AD_UNIT_ID_ANDROID   := "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX"  # ← replace
-const BANNER_AD_UNIT_ID_IOS       := "ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX"  # ← replace
+const REWARDED_AD_UNIT_ID_ANDROID := "ca-app-pub-7490319266490177/5031511614"
+const REWARDED_AD_UNIT_ID_IOS     := "ca-app-pub-7490319266490177/5031511614"  # ← replace with iOS unit when ready
+const BANNER_AD_UNIT_ID_ANDROID   := "ca-app-pub-7490319266490177/6834501694"
+const BANNER_AD_UNIT_ID_IOS       := "ca-app-pub-7490319266490177/6834501694"  # ← replace with iOS unit when ready
 
 # Test IDs (Google official test units)
 const TEST_REWARDED_ANDROID := "ca-app-pub-3940256099942544/5224354917"
@@ -29,7 +29,7 @@ var _ad_loaded: bool = false
 var _banner_showing: bool = false
 var _banner_cycle_timer: Timer = null
 var _pending_callback: Callable = Callable()
-var _use_test_ads: bool = true  # ← flip to false before release
+var _use_test_ads: bool = false  # using real ad units
 
 ## Set to true via IAP purchase or restore. Persisted in settings.json.
 var no_ads: bool = false
