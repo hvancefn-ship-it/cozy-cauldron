@@ -1,6 +1,7 @@
 extends Node
-## AdMob bridge — wraps the GodotAdMob plugin (or stubs it in editor/web builds).
-## Handles: banner ads, rewarded ads, and the no-ads IAP flag.
+## AdMob bridge — wraps the Poing Studios GodotAdMob v4 plugin.
+## Classes like MobileAds/AdView only exist at runtime on Android.
+## All AdMob class references are made via ClassDB/call() to avoid editor parse errors.
 
 signal rewarded_ad_completed()
 signal rewarded_ad_failed()
@@ -9,75 +10,65 @@ signal no_ads_restored()
 signal banner_visibility_changed(visible: bool)
 
 # ── Ad Unit IDs ────────────────────────────────────────────────────────────
-const APP_ID_ANDROID := "ca-app-pub-7490319266490177~4523185667"
+const APP_ID_ANDROID              := "ca-app-pub-7490319266490177~4523185667"
 const REWARDED_AD_UNIT_ID_ANDROID := "ca-app-pub-7490319266490177/5031511614"
-const REWARDED_AD_UNIT_ID_IOS     := "ca-app-pub-7490319266490177/5031511614"  # ← replace with iOS unit when ready
+const REWARDED_AD_UNIT_ID_IOS     := "ca-app-pub-7490319266490177/5031511614"
 const BANNER_AD_UNIT_ID_ANDROID   := "ca-app-pub-7490319266490177/6834501694"
-const BANNER_AD_UNIT_ID_IOS       := "ca-app-pub-7490319266490177/6834501694"  # ← replace with iOS unit when ready
+const BANNER_AD_UNIT_ID_IOS       := "ca-app-pub-7490319266490177/6834501694"
 
-# Test IDs (Google official test units)
 const TEST_REWARDED_ANDROID := "ca-app-pub-3940256099942544/5224354917"
 const TEST_REWARDED_IOS     := "ca-app-pub-3940256099942544/1712485313"
 const TEST_BANNER_ANDROID   := "ca-app-pub-3940256099942544/6300978111"
 const TEST_BANNER_IOS       := "ca-app-pub-3940256099942544/2934735716"
 
-const SETTINGS_PATH := "user://settings.json"
+const SETTINGS_PATH      := "user://settings.json"
 const BANNER_ON_SECONDS  := 45.0
 const BANNER_OFF_SECONDS := 90.0
 
-var _admob: Node = null
-var _ad_loaded: bool = false
+var _is_mobile: bool = false
+var _initialized: bool = false
 var _banner_showing: bool = false
 var _banner_cycle_timer: Timer = null
-var _pending_callback: Callable = Callable()
-var _use_test_ads: bool = false  # using real ad units
+var _ad_view: Object = null
+var _rewarded_ad: Object = null
+var _pending_reward_callback: Callable = Callable()
+var _use_test_ads: bool = false
 
-## Set to true via IAP purchase or restore. Persisted in settings.json.
+## Persisted — true when no-ads IAP purchased.
 var no_ads: bool = false
 
 
 func _ready() -> void:
 	_load_no_ads()
-	_try_init_admob()
+	_is_mobile = OS.get_name() in ["Android", "iOS"]
+	if not _is_mobile:
+		push_warning("AdMobBridge: not on mobile — stub mode.")
+		if not no_ads:
+			_start_banner_cycle()
+		return
+	if not ClassDB.class_exists("MobileAds"):
+		push_warning("AdMobBridge: MobileAds not found — plugin not active on this build.")
+		return
+	ClassDB.instantiate("MobileAds")  # triggers initialize via the singleton
+	if ClassDB.class_exists("MobileAds"):
+		var ma := Engine.get_singleton("MobileAds") if Engine.has_singleton("MobileAds") else null
+		if ma:
+			ma.initialize()
+	_initialized = true
+	_load_rewarded_ad()
 	if not no_ads:
 		_start_banner_cycle()
 
 
-func _try_init_admob() -> void:
-	if not Engine.has_singleton("AdMob"):
-		push_warning("AdMobBridge: AdMob singleton not found — stub mode.")
-		return
-	_admob = Engine.get_singleton("AdMob")
-	if _admob == null:
-		return
-
-	# Rewarded signals
-	_admob.rewarded_ad_loaded.connect(_on_rewarded_loaded)
-	_admob.rewarded_ad_failed_to_load.connect(_on_rewarded_failed_to_load)
-	_admob.rewarded_ad_watched.connect(_on_rewarded_watched)
-	_admob.rewarded_ad_failed_to_show.connect(_on_rewarded_failed_to_show)
-
-	# Banner signals (optional — plugin may not emit these)
-	if _admob.has_signal("banner_ad_loaded"):
-		_admob.banner_ad_loaded.connect(_on_banner_loaded)
-	if _admob.has_signal("banner_ad_failed_to_load"):
-		_admob.banner_ad_failed_to_load.connect(_on_banner_failed)
-
-	_load_rewarded_ad()
-
-
-# ── Banner cycle ────────────────────────────────────────────────────────────
+# ── Banner cycle ─────────────────────────────────────────────────────────────
 
 func _start_banner_cycle() -> void:
-	if no_ads:
-		return
-	if _banner_cycle_timer != null:
+	if no_ads or _banner_cycle_timer != null:
 		return
 	_banner_cycle_timer = Timer.new()
 	_banner_cycle_timer.one_shot = true
 	add_child(_banner_cycle_timer)
 	_banner_cycle_timer.timeout.connect(_on_banner_cycle_tick)
-	# Start with the banner hidden — first show after OFF_SECONDS
 	_banner_cycle_timer.start(BANNER_OFF_SECONDS)
 
 
@@ -103,16 +94,15 @@ func _on_banner_cycle_tick() -> void:
 func _show_banner_internal() -> void:
 	if no_ads or _banner_showing:
 		return
-	if _admob == null:
-		# Stub — notify Main so it can adjust layout
+	if not _is_mobile or not _initialized:
 		_banner_showing = true
 		banner_visibility_changed.emit(true)
 		return
-	_admob.load_banner_ad(
-		_get_banner_id(),
-		_admob.BANNER_SIZE_SMART,
-		_admob.BANNER_POSITION_TOP
-	)
+	# Use string-based construction to avoid parse errors in editor
+	if ClassDB.class_exists("AdView"):
+		_ad_view = ClassDB.instantiate("AdView")
+		_ad_view.call("initialize", _get_banner_id(), 0, 0)  # BANNER size, TOP position
+		_ad_view.call("load_ad")
 	_banner_showing = true
 	banner_visibility_changed.emit(true)
 
@@ -120,90 +110,84 @@ func _show_banner_internal() -> void:
 func _hide_banner_internal() -> void:
 	if not _banner_showing:
 		return
-	if _admob != null:
-		if _admob.has_method("hide_banner_ad"):
-			_admob.hide_banner_ad()
-		elif _admob.has_method("destroy_banner_ad"):
-			_admob.destroy_banner_ad()
+	if _ad_view != null:
+		if _ad_view.has_method("destroy"):
+			_ad_view.destroy()
+		_ad_view = null
 	_banner_showing = false
 	banner_visibility_changed.emit(false)
 
 
-## Called when no-ads is granted — stops the cycle and hides immediately.
 func hide_banner() -> void:
 	_stop_banner_cycle()
 	_hide_banner_internal()
 
 
-func _on_banner_loaded() -> void:
-	pass  # Banner auto-shows after load plugin-side
-
-
-func _on_banner_failed(_error: Dictionary) -> void:
-	_banner_showing = false
-	banner_visibility_changed.emit(false)
-
-
-# ── Rewarded ────────────────────────────────────────────────────────────────
+# ── Rewarded ─────────────────────────────────────────────────────────────────
 
 func _load_rewarded_ad() -> void:
-	if _admob == null:
+	if not _initialized or not ClassDB.class_exists("RewardedAdLoader"):
 		return
-	_ad_loaded = false
-	_admob.load_rewarded_ad(_get_rewarded_id())
+	var loader: Object = ClassDB.instantiate("RewardedAdLoader")
+	var request: Object = ClassDB.instantiate("AdRequest") if ClassDB.class_exists("AdRequest") else null
+	var cb: Object = ClassDB.instantiate("RewardedAdLoadCallback") if ClassDB.class_exists("RewardedAdLoadCallback") else null
+	if cb:
+		cb.set("on_ad_loaded", Callable(self, "_on_rewarded_loaded"))
+		cb.set("on_ad_failed_to_load", Callable(self, "_on_rewarded_failed_to_load"))
+	if loader and request and cb:
+		loader.call("load", _get_rewarded_id(), request, cb)
 
 
-func _on_rewarded_loaded() -> void:
-	_ad_loaded = true
+func _on_rewarded_loaded(ad: Object) -> void:
+	_rewarded_ad = ad
 
 
-func _on_rewarded_failed_to_load(_error: Dictionary) -> void:
-	_ad_loaded = false
+func _on_rewarded_failed_to_load(_error: Object) -> void:
+	_rewarded_ad = null
 
 
-func _on_rewarded_watched(_reward: Dictionary) -> void:
-	_ad_loaded = false
-	_load_rewarded_ad()
-	rewarded_ad_completed.emit()
-	if _pending_callback.is_valid():
-		_pending_callback.call(true)
-	_pending_callback = Callable()
-
-
-func _on_rewarded_failed_to_show(_error: Dictionary) -> void:
-	rewarded_ad_failed.emit()
-	if _pending_callback.is_valid():
-		_pending_callback.call(false)
-	_pending_callback = Callable()
-
-
-## Show a rewarded ad. callback(success: bool) fires on completion or failure.
 func show_rewarded_ad(callback: Callable) -> void:
-	_pending_callback = callback
-	if _admob == null:
+	_pending_reward_callback = callback
+	if not _is_mobile or not _initialized:
+		# Stub
 		push_warning("AdMobBridge: stub mode — simulating rewarded ad.")
 		await get_tree().create_timer(0.5).timeout
 		rewarded_ad_completed.emit()
-		if _pending_callback.is_valid():
-			_pending_callback.call(true)
-		_pending_callback = Callable()
+		if _pending_reward_callback.is_valid():
+			_pending_reward_callback.call(true)
+		_pending_reward_callback = Callable()
 		return
-	if not _ad_loaded:
-		push_warning("AdMobBridge: ad not loaded yet.")
-		_load_rewarded_ad()
+	if _rewarded_ad == null:
+		push_warning("AdMobBridge: rewarded ad not ready.")
 		callback.call(false)
-		_pending_callback = Callable()
+		_pending_reward_callback = Callable()
+		_load_rewarded_ad()
 		return
-	_admob.show_rewarded_ad()
+	if ClassDB.class_exists("OnUserEarnedRewardListener"):
+		var reward_cb: Object = ClassDB.instantiate("OnUserEarnedRewardListener")
+		reward_cb.set("on_user_earned_reward", Callable(self, "_on_reward_earned"))
+		_rewarded_ad.call("show", reward_cb)
+	else:
+		callback.call(false)
+
+
+func _on_reward_earned(_reward: Object) -> void:
+	_rewarded_ad = null
+	_load_rewarded_ad()
+	rewarded_ad_completed.emit()
+	if _pending_reward_callback.is_valid():
+		_pending_reward_callback.call(true)
+	_pending_reward_callback = Callable()
 
 
 func is_rewarded_ready() -> bool:
-	return _admob == null or _ad_loaded
+	if not _is_mobile:
+		return true
+	return _rewarded_ad != null
 
 
-# ── No-Ads IAP ──────────────────────────────────────────────────────────────
+# ── No-Ads IAP ───────────────────────────────────────────────────────────────
 
-## Called by IAPBridge when purchase completes or is restored.
 func grant_no_ads() -> void:
 	no_ads = true
 	_save_no_ads()
@@ -211,7 +195,6 @@ func grant_no_ads() -> void:
 	no_ads_purchased.emit()
 
 
-## Called by IAPBridge on restore.
 func restore_no_ads() -> void:
 	no_ads = true
 	_save_no_ads()
@@ -247,7 +230,7 @@ func _save_no_ads() -> void:
 		fw.close()
 
 
-# ── Helpers ─────────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
 func _get_rewarded_id() -> String:
 	if _use_test_ads:
